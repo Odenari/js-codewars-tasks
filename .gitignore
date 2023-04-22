@@ -1,4 +1,11 @@
-preview.zip
+/Archieves
 /Temp
 /codewars(etc)/console app and tasks
+
 /MartianFilmProject
+/node_modules
+/.vscode
+.eslintrc.json
+package.json
+package-lock.json
+
