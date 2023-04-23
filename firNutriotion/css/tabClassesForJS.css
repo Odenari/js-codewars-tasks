@@ -2,7 +2,10 @@
 
 .hide {display: none;}
 
-.fade {animation: fade 1.5s;}
+.fade {
+	transition: animation, ease-in-out;
+	animation: fade .5s;
+	}
 
 @keyframes fade {
 from {opacity: 0.1;}
