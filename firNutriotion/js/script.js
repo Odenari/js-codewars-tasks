@@ -109,8 +109,8 @@ document.addEventListener('DOMContentLoaded', () => {
 		clearInterval(modalTimerId);// if modal was open remove timer for showing modal
 	}
 
-	
-	const modalTimerId = setTimeout(showModal, 4000);
+
+	const modalTimerId = setTimeout(showModal, 3000);
 
 	//Modal at the end of page 
 	function showModalByScroll() {
@@ -120,12 +120,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
 			//removing handler after modal was showing once
 			removeEventListener('scroll', showModalByScroll);
+			//removing timer modal if user fastscrolling to the end of page
+			clearInterval(modalTimerId);
 		}
 	}
-	
+
 	window.addEventListener('scroll', showModalByScroll);
 
-	
+
 	modalBtns.forEach(btn => {
 		btn.addEventListener('click', () => {
 			// modalOverlay.classList.add('show');
@@ -164,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-	
+
 	//* modalBlock = modalOverlay.querySelector('.modal__dialog');
 	//* btns = document.querySelectorAll('button[data-modal]'),
 
