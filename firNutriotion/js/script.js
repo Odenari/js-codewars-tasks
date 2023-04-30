@@ -106,11 +106,11 @@ document.addEventListener('DOMContentLoaded', () => {
 		modalOverlay.classList.toggle('show');
 		modalOverlay.classList.add('fade');
 		document.body.style.overflow = 'hidden';
-		clearInterval(modalTimerId);// if modal was open remove timer for showing modal
+		// clearInterval(modalTimerId);// if modal was open remove timer for showing modal
 	}
 
 
-	const modalTimerId = setTimeout(showModal, 3000);
+	// const modalTimerId = setTimeout(showModal, 3000);
 
 	//Modal at the end of page 
 	function showModalByScroll() {
@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			//removing handler after modal was showing once
 			removeEventListener('scroll', showModalByScroll);
 			//removing timer modal if user fastscrolling to the end of page
-			clearInterval(modalTimerId);
+			// clearInterval(modalTimerId);
 		}
 	}
 
@@ -169,7 +169,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	//* modalBlock = modalOverlay.querySelector('.modal__dialog');
 	//* btns = document.querySelectorAll('button[data-modal]'),
-
 	// const closeModal = function (x) {
 	// 	x.addEventListener('click', () => {
 	// 		if (window.getComputedStyle(modalOverlay).display === 'flex') {
@@ -196,5 +195,70 @@ document.addEventListener('DOMContentLoaded', () => {
 	// 	});
 	// });
 
+	//* Creating menu cards with class
+
+	const cardContainer = document.querySelector('.menu__field .container');
+	console.log(cardContainer);
+	class MenuCard {
+		constructor(src, alt, title, descr, price, parentSelector, ...classes) {
+			this.src = src;
+			this.alt = alt;
+			this.descr = descr;
+			this.title = title;
+			this.price = price;
+			this.classes = classes;
+			this.transfer = 44; //new prop
+			this.parent = document.querySelector(parentSelector);// prop of parenet elem to deploy our card on page
+			this.changeToUAH(); // invoking inside constructor to parse USD into UAH and assign to prop of our exemp
+		}
+		changeToUAH() {
+			this.price = this.price * this.transfer;
+		}
+
+		render() {
+			const card = document.createElement('div');
+			this.classes.forEach(className => card.classList.add(className) );
+			card.innerHTML = `<img src=${this.src} alt=${this.alt}>
+                    <h3 class="menu__item-subtitle">${this.title}</h3>
+                    <div class="menu__item-descr">${this.descr}</div>
+                    <div class="menu__item-divider"></div>
+                    <div class="menu__item-price">
+                        <div class="menu__item-cost">Цена:</div>
+                        <div class="menu__item-total"><span>${this.price}</span> грн/день</div>
+                    </div>`;
+			this.parent.append(card);
+		}
+	}
+
+	new MenuCard(
+		'img/tabs/vegy.jpg',
+		'vegy',
+		'Меню "Фитнес"',
+		'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих  овощей и фруктов. Продукт активных и здоровых людей.Это абсолютно новый продукт с оптимальной  ценой и высоким качеством!',
+		9,
+		'.menu .container',
+		'menu__item', 
+		'big'
+	).render();
+
+	new MenuCard(
+		'img/tabs/elite.jpg',
+		'elite',
+		'Меню “Премиум"',
+		'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - подлинное и полноценное ресторанное меню без похода в ресторан!',
+		12,
+		'.menu .container',
+		'menu__item'
+	).render();
+
+	new MenuCard(
+		'img/tabs/post.jpg',
+		'post',
+		'Меню “Постное”',
+		'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
+		9,
+		'.menu .container',
+		'menu__item'
+	).render();
 
 });
