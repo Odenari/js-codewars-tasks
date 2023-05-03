@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	});
 
 	//Timer
-	const deadline = '2023-04-27';
+	const deadline = '2024-06-04';
 	function getTimeRemaining(endtime) {
 		let days, hours, mins, seconds;
 		const t = Date.parse(endtime) - Date.parse(new Date());
@@ -97,20 +97,22 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 	setClock('.timer', deadline);
 
-	//Modal
+	//Modal's
 	const modalBtns = document.querySelectorAll('[data-modal]'),
-		close = document.querySelector('[data-close]'),
 		modalOverlay = document.querySelector('.modal');
 
 	function showModal() {
-		modalOverlay.classList.toggle('show');
+
+		modalOverlay.classList.add('show');
+		modalOverlay.classList.remove('hide');
 		modalOverlay.classList.add('fade');
 		document.body.style.overflow = 'hidden';
-		// clearInterval(modalTimerId);// if modal was open remove timer for showing modal
+
+		clearInterval(modalTimerId);// if modal was open remove timer for showing modal
 	}
 
 
-	// const modalTimerId = setTimeout(showModal, 3000);
+	const modalTimerId = setTimeout(showModal, 60000);
 
 	//Modal at the end of page 
 	function showModalByScroll() {
@@ -121,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			//removing handler after modal was showing once
 			removeEventListener('scroll', showModalByScroll);
 			//removing timer modal if user fastscrolling to the end of page
-			// clearInterval(modalTimerId);
+			clearInterval(modalTimerId);
 		}
 	}
 
@@ -130,29 +132,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	modalBtns.forEach(btn => {
 		btn.addEventListener('click', () => {
-			// modalOverlay.classList.add('show');
-			// modalOverlay.classList.remove('hide');
 			showModal();
-
 		});
 
 	});
 
-
-
 	function closeModal() {
-
-		// modalOverlay.classList.remove('show');
-		// modalOverlay.classList.add('hide');
-
 		modalOverlay.classList.remove('show');
 		document.body.style.overflow = ''; //?браузер сам подставит нужное свойство в пустую строку!
 	}
 
-	close.addEventListener('click', closeModal);
-
 	modalOverlay.addEventListener('click', (e) => {
-		if (e.target === modalOverlay) {
+		// If user clicked on overlay or clicked on  an element wich have attribute data close => closemodal will invoke!
+		if (e.target === modalOverlay || e.target.getAttribute('data-close') === '') {
 			closeModal();
 		}
 
@@ -163,9 +155,6 @@ document.addEventListener('DOMContentLoaded', () => {
 			closeModal();
 		}
 	});
-
-
-
 
 	//* modalBlock = modalOverlay.querySelector('.modal__dialog');
 	//* btns = document.querySelectorAll('button[data-modal]'),
@@ -197,8 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	//* Creating menu cards with class
 
-	const cardContainer = document.querySelector('.menu__field .container');
-	console.log(cardContainer);
+	//class representing structure of our cards, args those cards are needed
 	class MenuCard {
 		constructor(src, alt, title, descr, price, parentSelector, ...classes) {
 			this.src = src;
@@ -207,17 +195,24 @@ document.addEventListener('DOMContentLoaded', () => {
 			this.title = title;
 			this.price = price;
 			this.classes = classes;
-			this.transfer = 44; //new prop
-			this.parent = document.querySelector(parentSelector);// prop of parenet elem to deploy our card on page
-			this.changeToUAH(); // invoking inside constructor to parse USD into UAH and assign to prop of our exemp
+			this.transfer = 44; //new prop representing current exchange rate (USD => UAH)
+			this.parent = document.querySelector(parentSelector);// prop of parenet elem to easy deploy our card on page
+			this.changeToUAH(); // function invoked inside constructor to parse USD into UAH and assign to prop of our entity of menu card
 		}
+		//Creating methods here isnt the best solution | moving methods to .prototype will allow to  all cards inherit methods vs creating every method in every card instance (optimizing memory?)
 		changeToUAH() {
 			this.price = this.price * this.transfer;
 		}
 
 		render() {
+			//creating a card element
 			const card = document.createElement('div');
-			this.classes.forEach(className => card.classList.add(className) );
+
+			//Adding every class passed by from  arguments of constructor to our card element   
+			this.classes.forEach(className => card.classList.add(className));
+
+
+			//actual HTML code of card with different values for each created card
 			card.innerHTML = `<img src=${this.src} alt=${this.alt}>
                     <h3 class="menu__item-subtitle">${this.title}</h3>
                     <div class="menu__item-descr">${this.descr}</div>
@@ -226,10 +221,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="menu__item-cost">Цена:</div>
                         <div class="menu__item-total"><span>${this.price}</span> грн/день</div>
                     </div>`;
+
+			//deploying card on page at last place of parent container from args		
 			this.parent.append(card);
 		}
 	}
 
+	//creating cards w/o variables cuz they only existing like static elements of our page and no JS operations needed in future
 	new MenuCard(
 		'img/tabs/vegy.jpg',
 		'vegy',
@@ -237,9 +235,9 @@ document.addEventListener('DOMContentLoaded', () => {
 		'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих  овощей и фруктов. Продукт активных и здоровых людей.Это абсолютно новый продукт с оптимальной  ценой и высоким качеством!',
 		9,
 		'.menu .container',
-		'menu__item', 
+		'menu__item',
 		'big'
-	).render();
+	).render(); // invoking method immediately
 
 	new MenuCard(
 		'img/tabs/elite.jpg',
@@ -261,4 +259,102 @@ document.addEventListener('DOMContentLoaded', () => {
 		'menu__item'
 	).render();
 
+
+	//POST from forms
+	const forms = document.querySelectorAll('form');
+
+	//*POST method usually wrapped in function
+	function postData(form) {
+		form.addEventListener('submit', (event) => {
+			event.preventDefault();
+
+			const request = new XMLHttpRequest(), //request object
+				formData = new FormData(form), //объект который будет хранить данные полученные из формы!
+				messages = { //object for telling users about his interactions with form 
+					loading: 'Загрузка',
+					done: 'Спасибо, скоро мы с вами свяжемся',
+					failure: 'Что-то пошло не так :('
+				},
+				statusMessage = document.createElement('div');
+
+			statusMessage.classList.add('status'); //if there are css rule we can add it to container
+			statusMessage.textContent = messages.loading;
+			form.append(statusMessage);
+
+			//*FormData variant of POST method
+			// request.open('POST', 'server.php');//opening request with POST method and URI of server
+			// request.setRequestHeader('Content-type', 'multipart/form-data');//*headers for FormData object not needed !!
+			// request.send(formData); //formData are object with users data from inputs!
+
+			//*JSON variant of POST request
+			//parsing formDara format to object wich later will be parsed to JSON
+			const obj = {};
+			formData.forEach((value, key) => {
+				obj[key] = value;
+			});
+
+			const json = JSON.stringify(obj);
+			request.open('POST', 'server.php');
+
+			//*Header info with value of format of request method are necessary for JSON !
+			request.setRequestHeader('Content-type', 'application/json');
+
+			request.send(json);
+
+			//adding eventHandler for proccesing response from a server
+			request.addEventListener('load', () => {
+
+				if (request.status === 200) {
+
+					console.log(request.response);
+
+					//showing message if everything done
+					showThanksModal(messages.done);
+
+					//method reset() are clearing inputs in form
+					form.reset();
+
+					//removing message from screen (by deleting container elem)
+					statusMessage.remove();
+
+				} else {
+
+					//showing error message if response not equal 200
+					showThanksModal(messages.failure);
+
+				}
+			});
+		});
+	}
+
+	//invoking function of sending data to every form on page!
+	forms.forEach(form => postData(form));
+
+	//adding gratitude modals
+	function showThanksModal(message) {
+
+		const modalContainer = document.querySelector('.modal__dialog');
+		modalContainer.classList.add('hide');
+		showModal();
+
+		const thanksModal = document.createElement('div');
+		thanksModal.classList.add('modal__dialog');
+
+		thanksModal.innerHTML = `
+			<div class="modal__content">
+				<div class="modal__close" data-close>&#215;</div>
+				<div class="modal__title">${message}</div>
+			</div>
+		`;
+
+		modalOverlay.append(thanksModal);
+
+		setTimeout(() => {
+			thanksModal.remove();
+			modalContainer.classList.add('show');
+			modalContainer.classList.remove('hide');
+			closeModal();
+		}, 4000);
+	}
 });
+
