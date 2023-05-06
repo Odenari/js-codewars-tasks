@@ -1,7 +1,7 @@
 'use strict';
 
 //Es11 2020
-//? Оператор нулевого слияния (nullish operator) - ?? - возвращает значени справа если значение слева null или undefined
+//? Оператор нулевого слияния (nullish operator |nullish  coalaesing) - ?? - возвращает значениe справа если значение слева null или undefined
 //? Приоритет ниже чем у лог. "ИЛИ" и лог. "И"
 //? "??" оператор не может быть использован в одном выражении с лог. "И" или лог "ИЛИ"
 
@@ -18,6 +18,7 @@ function changeParams(elem, h, w) {
 
 changeParams(box, newHeight, newWidth);
 
-let userName;
-let userKey = 'I am not null and not undefined';
-console.log(userName ??  userKey ?? 'User');
+let userName = undefined;
+let userKey = null;
+// let userKey = 'I am not null and not undefined';
+console.log(userName ?? userKey ?? 'defaultUser');

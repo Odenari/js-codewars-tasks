@@ -268,62 +268,99 @@ document.addEventListener('DOMContentLoaded', () => {
 		form.addEventListener('submit', (event) => {
 			event.preventDefault();
 
-			const request = new XMLHttpRequest(), //request object
-				formData = new FormData(form), //объект который будет хранить данные полученные из формы!
-				messages = { //object for telling users about his interactions with form 
-					loading: 'Загрузка',
+
+
+
+			//object for telling users about his interactions with form 
+			const formData = new FormData(form), //объект который будет хранить данные полученные из формы
+				messages = {
+					loading: 'img/form/spinner.svg',
 					done: 'Спасибо, скоро мы с вами свяжемся',
 					failure: 'Что-то пошло не так :('
-				},
-				statusMessage = document.createElement('div');
+				};
 
-			statusMessage.classList.add('status'); //if there are css rule we can add it to container
-			statusMessage.textContent = messages.loading;
-			form.append(statusMessage);
+			//Creating a loading icon for request status loading (response not ready yet)	
+			const statusMessage = document.createElement('img');
+			statusMessage.src = messages.loading;
+			statusMessage.style.cssText = `
+				display: block;
+				margin: 0 auto;
+			`;
 
-			//*FormData variant of POST method
+			//insertAdjElem more powerfull than append, allow to deploy element after smth (config where to deploy in first arg)
+			form.insertAdjacentElement('afterend', statusMessage);
+
+			//?FormData variant of POST method
+			//const request = new XMLHttpRequest();
 			// request.open('POST', 'server.php');//opening request with POST method and URI of server
 			// request.setRequestHeader('Content-type', 'multipart/form-data');//*headers for FormData object not needed !!
 			// request.send(formData); //formData are object with users data from inputs!
 
-			//*JSON variant of POST request
-			//parsing formDara format to object wich later will be parsed to JSON
+			//?JSON variant of POST request
+			//parsing formData format to object wich later will be parsed to JSON
 			const obj = {};
 			formData.forEach((value, key) => {
 				obj[key] = value;
 			});
 
 			const json = JSON.stringify(obj);
-			request.open('POST', 'server.php');
+			// request.open('POST', 'server.php');
+			// Header info with value of format of request method are necessary for server to understan if it is JSON format file
+			// request.setRequestHeader('Content-type', 'application/json');
+			// request.send(json);
 
-			//*Header info with value of format of request method are necessary for JSON !
-			request.setRequestHeader('Content-type', 'application/json');
+			fetch('server.php', {
+				method: 'POST',
+				headers: {
+					'Content-type': 'application/json'
+				},
+				body: json
+			})
+				.then(data => data.text())
+				.then(data => {
 
-			request.send(json);
-
-			//adding eventHandler for proccesing response from a server
-			request.addEventListener('load', () => {
-
-				if (request.status === 200) {
-
-					console.log(request.response);
+					console.log(data);
 
 					//showing message if everything done
 					showThanksModal(messages.done);
 
-					//method reset() are clearing inputs in form
-					form.reset();
-
 					//removing message from screen (by deleting container elem)
 					statusMessage.remove();
-
-				} else {
-
-					//showing error message if response not equal 200
+				})
+				.catch(() => {
+					//showing error message if promise status rejected
 					showThanksModal(messages.failure);
+				})
+				.finally(() => {
+					//method reset() are clearing inputs in form
+					form.reset();
+				});
 
-				}
-			});
+
+
+			//adding eventHandler for proccesing response from a server
+			// request.addEventListener('load', () => {
+
+			// 	if (request.status === 200) {
+
+			// 		console.log(request.response);
+
+			// 		//showing message if everything done
+			// 		showThanksModal(messages.done);
+
+			// 		//method reset() are clearing inputs in form
+			// 		form.reset();
+
+			// 		//removing message from screen (by deleting container elem)
+			// 		statusMessage.remove();
+
+			// 	} else {
+
+			// 		//showing error message if response not equal 200
+			// 		showThanksModal(messages.failure);
+
+			// 	}
+			// });
 		});
 	}
 
