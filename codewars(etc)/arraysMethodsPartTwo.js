@@ -25,13 +25,17 @@ function showGoodFilms(arr) {
 }
 
 function showListOfFilms(arr) {
-	return arr.reduce((res, curr, i) => {
-		return res += curr.name + ((i === arr.length - 1) ? '' : ', ');
-	}, '');
+	return arr.reduce((acc, curr, i) => acc + curr.name + (i === arr.length - 1 ? '' : ', '), '');
 }
 
-const filmsNamesOnly = showListOfFilms(films);
-console.log(filmsNamesOnly);
+console.log(showListOfFilms(films));
+
+function showListOfFilmsMap(arr) {
+	return arr.map(film => film.name).join(', ');
+}
+
+const filmsNamesOnly = showListOfFilmsMap(films);
+// console.log(filmsNamesOnly);
 
 function setFilmsIds(arr) {
 	return arr.map((filmObj, index) => ({ ...filmObj, id: index }));

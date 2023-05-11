@@ -1,5 +1,5 @@
 'use strict';
-
+//this event handle function span all code inside and the scripts would not run before a content
 document.addEventListener('DOMContentLoaded', () => {
 
 	//Tabs
@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 
-	const modalTimerId = setTimeout(showModal, 60000);
+	// const modalTimerId = setTimeout(showModal, 60000);
 
 	//Modal at the end of page 
 	function showModalByScroll() {
@@ -213,82 +213,87 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 			//actual HTML code of card with different values for each created card
-			card.innerHTML = `<img src=${this.src} alt=${this.alt}>
+			card.innerHTML = `
+					<div class="menu__item">					
+					<img src=${this.src} alt=${this.alt}>
                     <h3 class="menu__item-subtitle">${this.title}</h3>
                     <div class="menu__item-descr">${this.descr}</div>
                     <div class="menu__item-divider"></div>
                     <div class="menu__item-price">
-                        <div class="menu__item-cost">Цена:</div>
-                        <div class="menu__item-total"><span>${this.price}</span> грн/день</div>
-                    </div>`;
+                    <div class="menu__item-cost">Цена:</div>
+                    <div class="menu__item-total"><span>${this.price}</span> грн/день</div>
+					</div>
+                    `;
 
 			//deploying card on page at last place of parent container from args		
 			this.parent.append(card);
 		}
 	}
+	//A separate function to get data for future creating of card HTML elements
+	// const getResource = async (url) => {
 
-	//creating cards w/o variables cuz they only existing like static elements of our page and no JS operations needed in future
-	new MenuCard(
-		'img/tabs/vegy.jpg',
-		'vegy',
-		'Меню "Фитнес"',
-		'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих  овощей и фруктов. Продукт активных и здоровых людей.Это абсолютно новый продукт с оптимальной  ценой и высоким качеством!',
-		9,
-		'.menu .container',
-		'menu__item',
-		'big'
-	).render(); // invoking method immediately
+	// 	const promise = await fetch(url);
 
-	new MenuCard(
-		'img/tabs/elite.jpg',
-		'elite',
-		'Меню “Премиум"',
-		'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - подлинное и полноценное ресторанное меню без похода в ресторан!',
-		12,
-		'.menu .container',
-		'menu__item'
-	).render();
+	// 	if(!promise.ok) {
+	// 		throw new Error(`Couldn't fetch data from ${url}, status: ${promise.status}`);
+	// 	}
 
-	new MenuCard(
-		'img/tabs/post.jpg',
-		'post',
-		'Меню “Постное”',
-		'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
-		9,
-		'.menu .container',
-		'menu__item'
-	).render();
+	// 	return await promise.json();
+	// };
 
+	// getResource('http://localhost:3000/menu')
+	// 	.then(data => {
+	// 		data.forEach(({img, altimg, title, descr, price}) => {
+	// 			new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
+	// 		});
+	// 	});
 
+	// eslint-disable-next-line no-undef
+	//*axios library read docs!
+	// eslint-disable-next-line no-undef
+	axios.get('http://localhost:3000/menu')
+		.then(respond => {
+			respond.data.forEach(({ img, altimg, title, descr, price }) => {
+				new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
+			});
+		});
 	//POST from forms
 	const forms = document.querySelectorAll('form');
 
-	//*POST method usually wrapped in function
-	function postData(form) {
+	//A separate function to interact with serverside (database)
+	const postData = async (url, data) => {
+		const promise = await fetch(url, {
+			method: 'POST',
+			headers: {
+				'Content-type': 'application/json'
+			},
+			body: data
+		});
+		return await promise.json();
+	};
+
+	//*POST method usually wrapped in function 
+	function bindpostData(form) {
 		form.addEventListener('submit', (event) => {
 			event.preventDefault();
 
-
-
-
 			//object for telling users about his interactions with form 
-			const formData = new FormData(form), //объект который будет хранить данные полученные из формы
-				messages = {
-					loading: 'img/form/spinner.svg',
-					done: 'Спасибо, скоро мы с вами свяжемся',
-					failure: 'Что-то пошло не так :('
-				};
+			const messages = {
+				loading: 'img/form/spinner.svg',
+				done: 'Спасибо, скоро мы с вами свяжемся',
+				failure: 'Что-то пошло не так :('
+			};
 
 			//Creating a loading icon for request status loading (response not ready yet)	
-			const statusMessage = document.createElement('img');
-			statusMessage.src = messages.loading;
-			statusMessage.style.cssText = `
+			const statusLoading = document.createElement('img');
+			statusLoading.src = messages.loading;
+			statusLoading.style.cssText = `
 				display: block;
 				margin: 0 auto;
 			`;
 
 			//insertAdjElem more powerfull than append, allow to deploy element after smth (config where to deploy in first arg)
-			form.insertAdjacentElement('afterend', statusMessage);
+			form.insertAdjacentElement('afterend', statusLoading);
 
 			//?FormData variant of POST method
 			//const request = new XMLHttpRequest();
@@ -296,76 +301,44 @@ document.addEventListener('DOMContentLoaded', () => {
 			// request.setRequestHeader('Content-type', 'multipart/form-data');//*headers for FormData object not needed !!
 			// request.send(formData); //formData are object with users data from inputs!
 
-			//?JSON variant of POST request
-			//parsing formData format to object wich later will be parsed to JSON
-			const obj = {};
-			formData.forEach((value, key) => {
-				obj[key] = value;
-			});
+			//parsing formData format to object wich later will be parsed to JSON old way
+			// const obj = {};
+			// formData.forEach((value, key) => {
+			// 	obj[key] = value;
+			// });
 
-			const json = JSON.stringify(obj);
+			//We can asign JSON obj or invoke JSON>stringify in function args
+			// const json = JSON.stringify(obj);
 			// request.open('POST', 'server.php');
 			// Header info with value of format of request method are necessary for server to understan if it is JSON format file
 			// request.setRequestHeader('Content-type', 'application/json');
 			// request.send(json);
 
-			fetch('server.php', {
-				method: 'POST',
-				headers: {
-					'Content-type': 'application/json'
-				},
-				body: json
-			})
-				.then(data => data.text())
-				.then(data => {
+			//formData a new object wich saves data from form
+			const formData = new FormData(form),
 
+				//Parsing formData to array of keys and values, parsing this array to usual JS obj, and then parsing this obj to JSON
+				json = JSON.stringify(Object.fromEntries(formData.entries()));
+
+			postData('http://localhost:3000/requests', json)
+				.then((data) => {
 					console.log(data);
-
 					//showing message if everything done
 					showThanksModal(messages.done);
-
 					//removing message from screen (by deleting container elem)
-					statusMessage.remove();
-				})
-				.catch(() => {
+					statusLoading.remove();
+				}).catch(() => {
 					//showing error message if promise status rejected
 					showThanksModal(messages.failure);
-				})
-				.finally(() => {
+				}).finally(() => {
 					//method reset() are clearing inputs in form
 					form.reset();
 				});
-
-
-
-			//adding eventHandler for proccesing response from a server
-			// request.addEventListener('load', () => {
-
-			// 	if (request.status === 200) {
-
-			// 		console.log(request.response);
-
-			// 		//showing message if everything done
-			// 		showThanksModal(messages.done);
-
-			// 		//method reset() are clearing inputs in form
-			// 		form.reset();
-
-			// 		//removing message from screen (by deleting container elem)
-			// 		statusMessage.remove();
-
-			// 	} else {
-
-			// 		//showing error message if response not equal 200
-			// 		showThanksModal(messages.failure);
-
-			// 	}
-			// });
 		});
 	}
 
 	//invoking function of sending data to every form on page!
-	forms.forEach(form => postData(form));
+	forms.forEach(form => bindpostData(form));
 
 	//adding gratitude modals
 	function showThanksModal(message) {
@@ -392,6 +365,99 @@ document.addEventListener('DOMContentLoaded', () => {
 			modalContainer.classList.remove('hide');
 			closeModal();
 		}, 4000);
+	}
+
+	//*slider by my own | first ever try
+
+
+	const sliderWrapper = document.querySelector('.offer__slider-wrapper'),
+		slideList = sliderWrapper.querySelectorAll('.offer__slide'),
+		prev = document.querySelector('.offer__slider-prev'),
+		next = document.querySelector('.offer__slider-next'),
+		currentElement = document.getElementById('current'),
+		totalElement = document.getElementById('total');
+
+	let currentIndex = 0,
+		slidesNum = slideList.length;
+
+	currentElement.innerText = `0${currentIndex + 1}`;
+	// console.log('slidesNum:', slidesNum);
+	console.log('currentIndex > ', currentIndex);
+
+	//default slide 
+	hideAllSlides(slideList);
+	showSlide(slideList, currentIndex);
+	showTotal(slideList);
+
+	prev.addEventListener('click', event => {
+		event.preventDefault();
+
+		if (currentIndex > 0 && currentIndex < 9) {
+			currentIndex = prevSlideAndIndex(slideList, currentIndex);
+			currentElement.innerText = `0${currentIndex + 1}`;
+			console.log('currentIndex:', currentIndex);
+		}
+
+		if (currentIndex > 9) {
+			currentIndex = prevSlideAndIndex(slideList, currentIndex);
+			currentElement.innerText = currentIndex;
+		}
+
+	});
+
+	next.addEventListener('click', event => {
+		event.preventDefault();
+
+		if (currentIndex >= 0 && currentIndex < 9 && currentIndex < slideList.length - 1) {
+			currentIndex = nextSlideAndIndex(slideList, currentIndex);
+			currentElement.innerText = `0${currentIndex + 1}`;
+		}
+
+		if (currentIndex > 9 && currentIndex < slideList.length - 1) {
+			hideSlide(slideList, currentIndex);
+			currentIndex++;
+			showSlide(slideList, currentIndex);
+			currentElement.innerText = currentIndex;
+		}
+
+	});
+
+	function showTotal(slides) {
+		if (slides.length > 0 && slides.length < 10) {
+			totalElement.innerText = '0' + slidesNum;
+		} else {
+			totalElement.innerText = slidesNum;
+		}
+	}
+
+	function showSlide(slides, index) {
+		slides[index].classList.remove('hide');
+		slides[index].classList.add('show');
+	}
+
+	function hideSlide(slides, index) {
+		slides[index].classList.remove('show');
+		slides[index].classList.add('hide');
+	}
+
+	function hideAllSlides(list) {
+		list.forEach(elem => {
+			elem.classList.add('hide');
+		});
+	}
+
+	function prevSlideAndIndex(slides, index) {
+		hideSlide(slides, index);
+		index--;
+		showSlide(slides, index);
+		return index;
+	}
+
+	function nextSlideAndIndex(slides, index) {
+		hideSlide(slides, index);
+		index++;
+		showSlide(slides, index);
+		return index;
 	}
 });
 
