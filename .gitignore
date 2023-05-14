@@ -4,7 +4,7 @@
 /MartianFilmProject
 /node_modules
 /.vscode
-/thisIsMine
+/codewars/thisIsMine
 .eslintrc.json
 answers.md
 questions.md

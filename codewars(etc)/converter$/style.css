@@ -1,0 +1,17 @@
+.container {
+	display: flex;	
+	flex-direction: column;
+	width: 130px;
+	/* gap: .5rem; */
+}
+input{
+	margin-bottom: 16px;
+	height: 36px;
+	width: fit-content;
+	border: 2px solid black;
+	border-radius: 8px;
+	font-size: 28px;
+}
+label + input {
+	margin-top: 2px;
+}
