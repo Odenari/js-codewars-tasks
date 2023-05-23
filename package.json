@@ -12,6 +12,8 @@
     "eslint": "^8.38.0"
   },
   "devDependencies": {
-    "json-server": "^0.17.3"
+    "json-server": "^0.17.3",
+    "webpack": "^5.83.1",
+    "webpack-cli": "^5.1.1"
   }
 }
