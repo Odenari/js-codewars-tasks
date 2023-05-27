@@ -1,109 +1,15 @@
-function slider() {
-	//? Slider by my own | first ever try
-	//  const slideList = document.querySelectorAll('.offer__slide'),
-	// 	prev = document.querySelector('.offer__slider-prev'),
-	// 	next = document.querySelector('.offer__slider-next'),
-	// 	currentElement = document.getElementById('current'),
-	// 	totalElement = document.getElementById('total');
 
-	// let currentIndex = 0,
-	// 	slidesNum = slideList.length;
+function slider({ container, slide, nextArrow, prevArrow, totalCounter, currentCounter, wrapper, field }) {
+	//Slider implementation of carousel style most common variant
 
-	// currentElement.innerText = `0${currentIndex + 1}`;
-	// // console.log('slidesNum:', slidesNum);
-	// console.log('currentIndex > ', currentIndex);
-
-	// //default slide 
-	// hideAllSlides(slideList);
-	// showSlide(slideList, currentIndex);
-	// showTotal(slideList);
-
-	// prev.addEventListener('click', event => {
-	// 	event.preventDefault();
-
-	// 	if (currentIndex > 0 && currentIndex < 9) {
-	// 		currentIndex = prevSlideAndIndex(slideList, currentIndex);
-	// 		currentElement.innerText = `0${currentIndex + 1}`;
-	// 		console.log('currentIndex:', currentIndex);
-	// 	}
-
-	// 	if (currentIndex > 9) {
-	// 		currentIndex = prevSlideAndIndex(slideList, currentIndex);
-	// 		currentElement.innerText = currentIndex;
-	// 	}
-
-	// });
-
-	// next.addEventListener('click', event => {
-	// 	event.preventDefault();
-
-	// 	if (currentIndex >= 0 && currentIndex < 9 && currentIndex < slideList.length - 1) {
-	// 		currentIndex = nextSlideAndIndex(slideList, currentIndex);
-	// 		currentElement.innerText = `0${currentIndex + 1}`;
-	// 	}
-
-	// 	if (currentIndex > 9 && currentIndex < slideList.length - 1) {
-	// 		hideSlide(slideList, currentIndex);
-	// 		currentIndex++;
-	// 		showSlide(slideList, currentIndex);
-	// 		currentElement.innerText = currentIndex;
-	// 	}
-
-	// });
-
-	// function showTotal(slides) {
-	// if (slides.length > 0 && slides.length < 10) {
-	// 	totalElement.innerText = '0' + slidesNum;
-	// } else {
-	// 	totalElement.innerText = slidesNum;
-	// }
-	// }
-
-	// function showSlide(slides, index) {
-	// 	slides[index].classList.remove('hide');
-	// 	slides[index].classList.add('show');
-	// }
-
-	// function hideSlide(slides, index) {
-	// 	slides[index].classList.remove('show');
-	// 	slides[index].classList.add('hide');
-	// }
-
-	// function hideAllSlides(list) {
-	// 	list.forEach(elem => {
-	// 		elem.classList.add('hide');
-	// 	});
-	// }
-
-	// function prevSlideAndIndex(slides, index) {
-	// 	hideSlide(slides, index);
-	// 	index--;
-	// 	showSlide(slides, index);
-	// 	return index;
-	// }
-
-	// function nextSlideAndIndex(slides, index) {
-	// 	hideSlide(slides, index);
-	// 	index++;
-	// 	showSlide(slides, index);
-	// 	return index;
-	// }
-
-	//?Slider implementation of carousel style most common variant
-	//This method required a one more wrapper for carousel so i added it in HTML stucture (offer__slider-inner)
-	//Variables of every wrapper od slider that we'll need 
-	const slider = document.querySelector('.offer__slider'),
-		mainSliderWrapper = document.querySelector('.offer__slider-wrapper'),
-		slideContainer = mainSliderWrapper.querySelector('.offer__slider-inner'),
-		slideList = mainSliderWrapper.querySelectorAll('.offer__slide'),
-
-		//btn-arrow elements
-		prev = document.querySelector('.offer__slider-prev'),
-		next = document.querySelector('.offer__slider-next'),
-
-		//counter elements
-		currentElement = document.getElementById('current'),
-		totalElement = document.getElementById('total'),
+	const slider = document.querySelector(container),
+		mainSliderWrapper = document.querySelector(wrapper),
+		slideContainer = mainSliderWrapper.querySelector(field),
+		slideList = mainSliderWrapper.querySelectorAll(slide),
+		prev = document.querySelector(prevArrow),
+		next = document.querySelector(nextArrow),
+		currentElement = document.getElementById(currentCounter),
+		totalElement = document.getElementById(totalCounter),
 
 		//Getting all computed styles through window object, but assigning only width prop
 		width = window.getComputedStyle(mainSliderWrapper).width;
@@ -149,7 +55,6 @@ function slider() {
 		indicators.append(dot);
 		dots.push(dot);
 	}
-
 
 	mainSliderWrapper.style.overflow = 'hidden';
 	slideContainer.style.display = 'flex';
@@ -202,13 +107,6 @@ function slider() {
 
 	next.addEventListener('click', () => {
 
-		//*It is ONLY seems hard
-		//slide.length - 1 neede for right appeareance w/o white slide at the end
-		//if our offset reach a border of container and we press next once more
-		//show to us first slide(loop of slides yep)
-		//+width.slice(0, width.length - 2) => width it is a string == {'500px'} 
-		// so we slicing num part and converting it into a number 500
-
 		if (offset == toNums(width) * (slideList.length - 1)) {
 			offset = 0;
 		} else {
@@ -237,22 +135,8 @@ function slider() {
 
 		counterMinus();
 		slideContainer.style.transform = `translateX(-${offset}px)`;
-
-		// dots.forEach((dot) => dot.style.opacity = .5);
-		// dots[slideIndex - 1].style.opacity = 1;
 		changingOpacity(dots, slideIndex);
 	});
-
-	//first implementation of dots nav
-	// dots.forEach((item, index, dots) => {
-	// 	item.addEventListener('click', () => {
-	// 		offset = +width.slice(0, width.length - 2) * index;
-	// 		slideContainer.style.transform = `translateX(-${offset}px)`;
-	// 		dots.forEach((dot) => dot.style.opacity = .5);
-	// 		item.style.opacity = 1;
-	// 		counterDots(currentElement, index);
-	// 	});
-	// });
 
 	//actually a more usefull implementation of dots nav through data-attribute
 	dots.forEach((dot, index, dots) => {
@@ -273,4 +157,4 @@ function slider() {
 	});
 };
 
-module.exports = slider;
+export default slider;

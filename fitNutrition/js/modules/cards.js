@@ -1,3 +1,5 @@
+import { getResource } from "../services/services";
+
 function cards() {
 	//* Creating menu cards with class
 	//class representing structure of our cards, args those cards are needed
@@ -44,34 +46,24 @@ function cards() {
 		}
 	}
 
-	//? A separate function to get data for future creating of card HTML elements
-	//  const getResource = async (url) => {
 
-	// 	const promise = await fetch(url);
 
-	// 	if(!promise.ok) {
-	// 		throw new Error(`Couldn't fetch data from ${url}, status: ${promise.status}`);
-	// 	}
-
-	// 	return await promise.json();
-	// };
-
-	// getResource('http://localhost:3000/menu')
-	// 	.then(data => {
-	// 		data.forEach(({img, altimg, title, descr, price}) => {
-	// 			new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
-	// 		});
-	// 	});
-
-	// eslint-disable-next-line no-undef
-	//*axios library read docs!
-	// eslint-disable-next-line no-undef
-	axios.get('http://localhost:3000/menu')
-		.then(respond => {
-			respond.data.forEach(({ img, altimg, title, descr, price }) => {
+	getResource('http://localhost:3000/menu')
+		.then(data => {
+			data.forEach(({ img, altimg, title, descr, price }) => {
 				new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
 			});
 		});
+
+	// // eslint-disable-next-line no-undef
+	// //*axios library read docs!
+	// // eslint-disable-next-line no-undef
+	// axios.get('http://localhost:3000/menu')
+	// 	.then(respond => {
+	// 		respond.data.forEach(({ img, altimg, title, descr, price }) => {
+	// 			new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
+	// 		});
+	// 	});
 };
 
-module.exports = cards;
+export default cards;

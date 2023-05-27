@@ -1,26 +1,56 @@
-function modals() {
+function showModal(modalSelector, modalTimerId) {
+	const modal = document.querySelector(modalSelector);
+	modal.classList.add('show');
+	modal.classList.remove('hide');
+	modal.classList.add('fade');
+	document.body.style.overflow = 'hidden';
 
-	const modalBtns = document.querySelectorAll('[data-modal]'),
-		modalOverlay = document.querySelector('.modal');
-
-	function showModal() {
-
-		modalOverlay.classList.add('show');
-		modalOverlay.classList.remove('hide');
-		modalOverlay.classList.add('fade');
-		document.body.style.overflow = 'hidden';
-
+	if (modalTimerId) {
 		clearInterval(modalTimerId);// if modal was open remove timer for showing modal
 	}
+}
 
+function closeModal(modalSelector) {
+	const modal = document.querySelector(modalSelector);
+	modal.classList.remove('show');
+	modal.classList.remove('fade');
+	document.body.style.overflow = ''; //?браузер сам подставит нужное свойство в пустую строку!
+}
 
-	const modalTimerId = setTimeout(showModal, 60000);
+function modals(modalBtnsSelector, modalSelector, modalTimerId) {
+
+	const modalBtns = document.querySelectorAll(modalBtnsSelector),
+		modal = document.querySelector(modalSelector);
+
+	modalBtns.forEach(btn => {
+		btn.addEventListener('click', () => {
+			showModal(modalSelector, modalTimerId);
+		});
+
+	});
+
+	modal.addEventListener('click', (e) => {
+		// If user clicked on overlay or clicked on  an element wich have attribute data close => closemodal will invoke!
+		if (e.target === modal || e.target.getAttribute('data-close') === '') {
+			closeModal(modalSelector);
+		}
+
+	});
+
+	document.addEventListener('keydown', (e) => {
+		if (e.code === 'Escape' && modal.classList.contains('show')) {
+			closeModal(modalSelector);
+		}
+	});
+
 
 	//Modal at the end of page 
+	window.addEventListener('scroll', showModalByScroll);
+
 	function showModalByScroll() {
 		//if listed height and screen height >= all height of all doc showModal
 		if (window.scrollY + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
-			showModal();
+			showModal(modalSelector, modalTimerId);
 
 			//removing handler after modal was showing once
 			removeEventListener('scroll', showModalByScroll);
@@ -29,62 +59,7 @@ function modals() {
 		}
 	}
 
-	window.addEventListener('scroll', showModalByScroll);
-
-
-	modalBtns.forEach(btn => {
-		btn.addEventListener('click', () => {
-			showModal();
-		});
-
-	});
-
-	function closeModal() {
-		modalOverlay.classList.remove('show');
-		document.body.style.overflow = ''; //?браузер сам подставит нужное свойство в пустую строку!
-	}
-
-	modalOverlay.addEventListener('click', (e) => {
-		// If user clicked on overlay or clicked on  an element wich have attribute data close => closemodal will invoke!
-		if (e.target === modalOverlay || e.target.getAttribute('data-close') === '') {
-			closeModal();
-		}
-
-	});
-
-	document.addEventListener('keydown', (e) => {
-		if (e.code === 'Escape' && modalOverlay.classList.contains('show')) {
-			closeModal();
-		}
-	});
-
-	//* modalBlock = modalOverlay.querySelector('.modal__dialog');
-	//* btns = document.querySelectorAll('button[data-modal]'),
-	// const closeModal = function (x) {
-	// 	x.addEventListener('click', () => {
-	// 		if (window.getComputedStyle(modalOverlay).display === 'flex') {
-	// 			modalOverlay.style.display = 'none';
-	// 		}
-	// 	});
-	// };
-
-
-	// function centerModal(mOverlay) {
-	// 	mOverlay.style.alignItems = 'center';
-	// }
-
-
-	// btns.forEach(btn => {
-	// 	btn.addEventListener('click', (e) => {
-	// 		e.preventDefault();
-	// 		if (window.getComputedStyle(modalOverlay).display === 'none') {
-	// 			centerModal(modalOverlay);
-	// 			modalOverlay.style.display = 'flex';
-	// 		}
-	// 		closeModal(close);
-
-	// 	});
-	// });
 };
 
-module.exports = modals;
+export default modals;
+export { showModal, closeModal};

@@ -4,10 +4,10 @@ let path = require('path');
 
 module.exports = {
   mode: 'development',
-  entry: '/firNutriotion/js/script.js',
+  entry: '/fitNutrition/js/script.js',
   output: {
     filename: 'bundle.js',
-    path: __dirname + '/firNutriotion/js/'
+    path: __dirname + '/fitNutrition/js/'
   },
   watch: true,
 
